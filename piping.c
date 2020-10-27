@@ -5,7 +5,7 @@
 int piping(char *homedir, char *command)
 {
     /**/
-    int nargv = 0, in = dup(STDIN_FILENO),
+    int argc = 0, in = dup(STDIN_FILENO),
         out = dup(STDOUT_FILENO);
     /**/
     int num = strlen(command);
@@ -35,16 +35,16 @@ int piping(char *homedir, char *command)
         }
         break;
     }
-    char **commands = split_commands(command, &nargv, "|");
+    char **commands = split_commands(command, &argc, "|");
     int filep[2];
     int status = 0;
-    if (nargv <= 1)
+    if (argc <= 1)
     {
         redirection(homedir, command);
         free(commands);
         return EXIT_SUCCESS;
     }
-    for (int i = 0; i < nargv; i++)
+    for (int i = 0; i < argc; i++)
     {
         if (i > 0)
         {
@@ -58,7 +58,7 @@ int piping(char *homedir, char *command)
             }
             close(filep[0]);
         }
-        if (i < nargv - 1)
+        if (i < argc - 1)
         {
             if (pipe(filep) < 0)
             {

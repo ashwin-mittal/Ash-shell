@@ -72,8 +72,8 @@ int parse(char *homedir)
             }
             if (flag)
             {
-                int nargv = 0;
-                char **argv = split_commands(commands[i], &nargv, " \r\n\t\a\b\f");
+                int argc = 0;
+                char **argv = split_commands(commands[i], &argc, " \r\n\t\a\b\f");
                 background_execute(argv);
                 continue;
             }

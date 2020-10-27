@@ -6,9 +6,9 @@
 
 int chaining(char *homedir, char *command)
 {
-    int nargv = strlen(command), status = 0,
+    int argc = strlen(command), status = 0,
         st = 0, len = 0, till_now = 0, number = 1;
-    for (int i = 0; i <= nargv; i++)
+    for (int i = 0; i <= argc; i++)
     {
         if (command[i] == '@' || command[i] == '$' ||
             command[i] == '\0')

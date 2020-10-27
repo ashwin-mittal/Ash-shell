@@ -14,13 +14,13 @@ int redirection(char *homedir, char *command)
     }
     line[idx] = '\0';
     /**/
-    int nargv = 0, write_fd, read_fd, in = dup(STDIN_FILENO), out = dup(STDOUT_FILENO);
-    char **commands = split_commands(command, &nargv, " \r\n\t\a\b\f");
-    for (int i = nargv - 1; i >= 0; i--)
+    int argc = 0, write_fd, read_fd, in = dup(STDIN_FILENO), out = dup(STDOUT_FILENO);
+    char **commands = split_commands(command, &argc, " \r\n\t\a\b\f");
+    for (int i = argc - 1; i >= 0; i--)
     {
         if (strcmp(commands[i], ">") == 0)
         {
-            if (i == nargv - 1)
+            if (i == argc - 1)
             {
                 error("invalid command");
                 dup2(in, STDIN_FILENO);
@@ -49,7 +49,7 @@ int redirection(char *homedir, char *command)
         }
         if (strcmp(commands[i], ">>") == 0)
         {
-            if (i == nargv - 1)
+            if (i == argc - 1)
             {
                 error("invalid command");
                 dup2(in, STDIN_FILENO);
@@ -77,11 +77,11 @@ int redirection(char *homedir, char *command)
             break;
         }
     }
-    for (int i = nargv - 1; i >= 0; i--)
+    for (int i = argc - 1; i >= 0; i--)
     {
         if (strcmp(commands[i], "<") == 0)
         {
-            if (i == nargv - 1)
+            if (i == argc - 1)
             {
                 error("invalid command");
                 dup2(in, STDIN_FILENO);
