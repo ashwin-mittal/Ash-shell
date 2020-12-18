@@ -2,7 +2,7 @@
 > A quick overview of the ash-shell.
 
 ## Background
-| Desciption |
+| Description |
 | --- |
  | The tilde `~` represents the home directory of the shell or the directory from which the shell is invoked.
  | Support for semicolon-separated commands, not affected by whitespace or tabs.
