@@ -1,29 +1,26 @@
-#include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+
 #include "headers.h"
 #include "shell.h"
 
-char *split(int number, char *buf)
-{
+char *split(int number, char *buf) {
     char *token;
     token = strtok(buf, " \r\n\t\a\b\f");
-    while (number-- && token != NULL)
-    {
+    while (number-- && token != NULL) {
         token = strtok(NULL, " \r\n\t\a\b\f");
     }
     return token;
 }
 
-int pinfo(char *homedir, char *pid)
-{
+int pinfo(char *homedir, char *pid) {
     size_t len = 0;
     char *proc = (char *)malloc(PATH_MAX + 5);
     char *buf = NULL, *bufm = (char *)malloc(PATH_MAX);
     sprintf(proc, "/proc/%s/stat", pid);
     FILE *file;
     file = fopen(proc, "r");
-    if (file == NULL)
-    {
+    if (file == NULL) {
         exit_code = EXIT_FAILURE;
         fprintf(stderr, "process with pid %s not found\n", pid);
         return (EXIT_FAILURE);
@@ -31,8 +28,7 @@ int pinfo(char *homedir, char *pid)
     printf("PID\t\t-- %s\n", pid);
     ssize_t nread;
     nread = getline(&buf, &len, file);
-    if (nread == -1)
-    {
+    if (nread == -1) {
         exit_code = EXIT_FAILURE;
         perror("getline");
         return (EXIT_FAILURE);
@@ -50,28 +46,24 @@ int pinfo(char *homedir, char *pid)
     buf = NULL;
     struct stat sb;
     ssize_t nbytes, bufsize;
-    if (lstat(proc, &sb) == -1)
-    {
+    if (lstat(proc, &sb) == -1) {
         exit_code = EXIT_FAILURE;
         perror("lstat");
         return (EXIT_FAILURE);
     }
     bufsize = sb.st_size + 1;
-    if (sb.st_size == 0)
-    {
+    if (sb.st_size == 0) {
         bufsize = PATH_MAX;
     }
     buf = malloc(bufsize);
-    if (buf == NULL)
-    {
+    if (buf == NULL) {
         exit_code = EXIT_FAILURE;
         perror("malloc");
         return (EXIT_FAILURE);
     }
     nbytes = readlink(proc, buf, bufsize);
     buf[nbytes] = '\0';
-    if (nbytes == -1)
-    {
+    if (nbytes == -1) {
         exit_code = EXIT_FAILURE;
         perror("readlink");
         return (EXIT_FAILURE);

@@ -1,35 +1,27 @@
-#include "shell.h"
-#include "headers.h"
 #include <sys/wait.h>
 
-int piping(char *homedir, char *command)
-{
+#include "headers.h"
+#include "shell.h"
+
+int piping(char *homedir, char *command) {
     /**/
     int argc = 0, in = dup(STDIN_FILENO),
         out = dup(STDOUT_FILENO);
     /**/
     int num = strlen(command);
-    for (int i = 0; i < num; i++)
-    {
-        if (command[i] == ' ')
-        {
+    for (int i = 0; i < num; i++) {
+        if (command[i] == ' ') {
             continue;
-        }
-        else if (command[i] == '|')
-        {
+        } else if (command[i] == '|') {
             error("command not found");
             return EXIT_SUCCESS;
         }
         break;
     }
-    for (int i = num - 1; i >= 0; i--)
-    {
-        if (command[i] == ' ')
-        {
+    for (int i = num - 1; i >= 0; i--) {
+        if (command[i] == ' ') {
             continue;
-        }
-        else if (command[i] == '|')
-        {
+        } else if (command[i] == '|') {
             error("command not found");
             return EXIT_SUCCESS;
         }
@@ -38,18 +30,14 @@ int piping(char *homedir, char *command)
     char **commands = split_commands(command, &argc, "|");
     int filep[2];
     int status = 0;
-    if (argc <= 1)
-    {
+    if (argc <= 1) {
         redirection(homedir, command);
         free(commands);
         return EXIT_SUCCESS;
     }
-    for (int i = 0; i < argc; i++)
-    {
-        if (i > 0)
-        {
-            if (dup2(filep[0], STDIN_FILENO) < 0)
-            {
+    for (int i = 0; i < argc; i++) {
+        if (i > 0) {
+            if (dup2(filep[0], STDIN_FILENO) < 0) {
                 exit_code = EXIT_FAILURE;
                 perror("Unable to duplicate file descriptor");
                 dup2(in, STDIN_FILENO);
@@ -58,18 +46,15 @@ int piping(char *homedir, char *command)
             }
             close(filep[0]);
         }
-        if (i < argc - 1)
-        {
-            if (pipe(filep) < 0)
-            {
+        if (i < argc - 1) {
+            if (pipe(filep) < 0) {
                 exit_code = EXIT_FAILURE;
                 perror("Could not execute pipe");
                 dup2(in, STDIN_FILENO);
                 dup2(out, STDOUT_FILENO);
                 return EXIT_SUCCESS;
             }
-            if (dup2(filep[1], STDOUT_FILENO) < 0)
-            {
+            if (dup2(filep[1], STDOUT_FILENO) < 0) {
                 exit_code = EXIT_FAILURE;
                 perror("Unable to duplicate file descriptor");
                 dup2(in, STDIN_FILENO);
@@ -79,28 +64,23 @@ int piping(char *homedir, char *command)
             close(filep[1]);
         }
         pid_t cpid = fork();
-        if (cpid == -1)
-        {
+        if (cpid == -1) {
             perror("fork");
             exit_code = EXIT_FAILURE;
             dup2(in, STDIN_FILENO);
             dup2(out, STDOUT_FILENO);
             return EXIT_SUCCESS;
         }
-        if (cpid == 0)
-        {
+        if (cpid == 0) {
             /* Code executed by child */
             status = redirection(homedir, commands[i]);
             exit(status);
-        }
-        else
-        {
+        } else {
             /* Code executed by parent */
             waitpid(cpid, &status, WUNTRACED);
             dup2(in, STDIN_FILENO);
             dup2(out, STDOUT_FILENO);
-            if (WEXITSTATUS(status))
-            {
+            if (WEXITSTATUS(status)) {
                 exit_code = EXIT_FAILURE;
                 return EXIT_SUCCESS;
             }

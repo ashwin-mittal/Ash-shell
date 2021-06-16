@@ -5,12 +5,10 @@
 #include "shell.h"
 
 /* function to split commands */
-char **split_commands(char *line, int *count, char *delim)
-{
+char **split_commands(char *line, int *count, char *delim) {
     char **commands = (char **)calloc(strlen(line) + 1, sizeof(char *));
     char *command = strtok(line, delim);
-    while (command != NULL)
-    {
+    while (command != NULL) {
         commands[*count] = command;
         command = strtok(NULL, delim);
         (*count)++;
@@ -19,14 +17,12 @@ char **split_commands(char *line, int *count, char *delim)
 }
 
 /* read and parse the commands */
-int parse(char *homedir)
-{
+int parse(char *homedir) {
     char *line = NULL, *history = NULL;
     size_t len = 0;
     ssize_t nread;
     nread = getline(&line, &len, stdin);
-    if (nread == -1)
-    {
+    if (nread == -1) {
         StoreHistory();
         printf("\n");
         /*perror("*** ERROR");*/
@@ -34,8 +30,7 @@ int parse(char *homedir)
     }
     line[--nread] = '\0';
     if (strcmp(line, "quit") == 0 ||
-        strcmp(line, "exit") == 0)
-    {
+        strcmp(line, "exit") == 0) {
         StoreHistory();
         return EXIT_FAILURE;
     }
@@ -43,35 +38,27 @@ int parse(char *homedir)
     strcpy(history, line);
     char *temp = history;
     history = strtok(history, " \r\n\t\a\b\f;");
-    if (history != NULL)
-    {
+    if (history != NULL) {
         addHistory(line);
         line[nread] = '\0';
     }
     free(temp);
     int count = 0, status = 0;
     char **commands = split_commands(line, &count, ";");
-    for (int i = 0; i < count; i++)
-    {
-        if ((nread = strlen(commands[i])) > 0)
-        {
+    for (int i = 0; i < count; i++) {
+        if ((nread = strlen(commands[i])) > 0) {
             int flag = 0;
-            for (int k = nread - 1; k >= 0; k--)
-            {
-                if (commands[i][k] == ' ')
-                {
+            for (int k = nread - 1; k >= 0; k--) {
+                if (commands[i][k] == ' ') {
                     continue;
-                }
-                else if (commands[i][k] == '&')
-                {
+                } else if (commands[i][k] == '&') {
                     commands[i][k] = '\0';
                     flag = EXIT_FAILURE;
                     break;
                 }
                 break;
             }
-            if (flag)
-            {
+            if (flag) {
                 int argc = 0;
                 char **argv = split_commands(commands[i], &argc, " \r\n\t\a\b\f");
                 background_execute(argv);
@@ -86,17 +73,14 @@ int parse(char *homedir)
     return status;
 }
 
-int split_exec(char *homedir, char *command)
-{
+int split_exec(char *homedir, char *command) {
     int size = 0;
     char **paths = NULL;
-    if (command == NULL)
-    {
+    if (command == NULL) {
         return EXIT_FAILURE;
     }
     paths = split_commands(command, &size, " \r\n\t\a\b\f");
-    if (size <= 0)
-    {
+    if (size <= 0) {
         return EXIT_FAILURE;
     }
     exit_code = bg_exec = 0;

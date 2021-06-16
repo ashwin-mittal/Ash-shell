@@ -1,16 +1,15 @@
+#include <signal.h>
+
 #include "headers.h"
 #include "shell.h"
-#include <signal.h>
 
 char *username, *homedir;
 
-char *getUser(void)
-{
+char *getUser(void) {
     return username;
 }
 
-char *getHomeDir(void)
-{
+char *getHomeDir(void) {
     return homedir;
 }
 
@@ -18,8 +17,7 @@ int exit_code = 0, bg_exec = 0;
 
 char *prevdir = NULL;
 
-int main(void)
-{
+int main(void) {
     /* clears screen */
     printf("\e[1;1H\e[2J");
     /* signal handler for Ctrl + C and Ctrl + Z */
@@ -33,8 +31,7 @@ int main(void)
     /* homedir of the shell */
     homedir = (char *)malloc(PATH_MAX);
     status = getlogin_r(username, LOGIN_NAME_MAX);
-    if (status)
-    {
+    if (status) {
         perror("getlogin_r");
         return EXIT_FAILURE;
     }
@@ -44,8 +41,7 @@ int main(void)
     /**/
     /* backgound processes data structure initialization */
     bg_init();
-    while (!status)
-    {
+    while (!status) {
         /* load the configuration */
         display();
 

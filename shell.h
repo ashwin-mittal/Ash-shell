@@ -9,8 +9,7 @@
 #define MAX_HISTORY_SIZE 20
 #define MAX_PROC 1024
 
-struct subprocess
-{
+struct subprocess {
     char **name;
     int pid, ash_id;
 };

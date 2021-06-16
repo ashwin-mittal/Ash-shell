@@ -1,19 +1,17 @@
 #include <dirent.h>
-#include <sys/stat.h>
-#include <time.h>
 #include <grp.h>
 #include <pwd.h>
+#include <sys/stat.h>
+#include <time.h>
+
 #include "headers.h"
 #include "shell.h"
 
-char *tilde_path(char *path, char *homedir)
-{
-    if (path[0] == '~')
-    {
+char *tilde_path(char *path, char *homedir) {
+    if (path[0] == '~') {
         char *p_new = (char *)malloc(PATH_MAX + 5);
         strcpy(p_new, homedir);
-        if (strlen(path) > 1)
-        {
+        if (strlen(path) > 1) {
             strcat(p_new, &path[1]);
         }
         path = p_new;
@@ -21,31 +19,25 @@ char *tilde_path(char *path, char *homedir)
     return path;
 }
 
-int list(int number, char *homedir, char **paths)
-{
+int list(int number, char *homedir, char **paths) {
     int actual[2] = {0};
     optionsCheck(number, paths, actual);
-    if (actual[0] == -1 && actual[1] == -1)
-    {
+    if (actual[0] == -1 && actual[1] == -1) {
         return EXIT_FAILURE;
     }
     int count = 0;
-    for (int i = 1; i < number; i++)
-    {
+    for (int i = 1; i < number; i++) {
         if (paths[i] == NULL ||
-            paths[i][0] == '-')
-        {
+            paths[i][0] == '-') {
             continue;
         }
         char *path = paths[i];
         path = tilde_path(path, homedir);
         struct stat stats;
-        if (count)
-        {
+        if (count) {
             printf("\n");
         }
-        if (stat(path, &stats) < 0)
-        {
+        if (stat(path, &stats) < 0) {
             exit_code = EXIT_FAILURE;
             fprintf(stderr, "*** ERROR: directory doesn't exist\n");
             return EXIT_SUCCESS;
@@ -54,27 +46,22 @@ int list(int number, char *homedir, char **paths)
         DIR *d;
         struct dirent *dir;
         d = opendir(path);
-        if (d)
-        {
-            while ((dir = readdir(d)) != NULL)
-            {
+        if (d) {
+            while ((dir = readdir(d)) != NULL) {
                 if (actual[1] == 0 &&
                     (!(strcmp(".", dir->d_name) &&
                        strcmp("..", dir->d_name) &&
                        (dir->d_name)[0] != '.') ||
-                     !strcmp("/", dir->d_name)))
-                {
+                     !strcmp("/", dir->d_name))) {
                     continue;
                 }
-                if (actual[0] == 0)
-                {
+                if (actual[0] == 0) {
                     printf("\r\033[1;36m%s\033[1;0m\n", dir->d_name);
                     continue;
                 }
                 char *name = (char *)malloc(PATH_MAX + PATH_MAX + 5);
                 strcpy(name, path);
-                if (path[strlen(path) - 1] != '/')
-                {
+                if (path[strlen(path) - 1] != '/') {
                     strcat(name, "/");
                 }
                 strcat(name, dir->d_name);
