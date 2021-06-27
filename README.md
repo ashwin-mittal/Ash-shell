@@ -1,4 +1,4 @@
-# ash-shell
+# Ash-shell
 
 > A quick overview of the ash-shell.
 
